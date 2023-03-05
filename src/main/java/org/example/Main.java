@@ -14,8 +14,36 @@ public class Main {
 
         List<Thread> threads = new ArrayList<>();
         int z = 0;
+
         for (String text : texts) {
-            Runnable myLogic = () -> {
+            threads.add(getNewThread(text));
+        }
+
+        for (Thread thread : threads) {
+            thread.start();
+        }
+
+        for (Thread thread : threads) {
+            thread.join();
+        }
+
+        long endTs = System.currentTimeMillis(); // end time
+
+        System.out.println("Time: " + (endTs - startTs) + "ms");
+    }
+
+    public static String generateText(String letters, int length) {
+        Random random = new Random();
+        StringBuilder text = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            text.append(letters.charAt(random.nextInt(letters.length())));
+        }
+        return text.toString();
+    }
+
+    public static Thread getNewThread(String text) {
+        return new Thread(
+            () -> {
                 int maxSize = 0;
                 for (int i = 0; i < text.length(); i++) {
                     for (int j = 0; j < text.length(); j++) {
@@ -35,27 +63,7 @@ public class Main {
                     }
                 }
                 System.out.println(text.substring(0, 100) + " -> " + maxSize);
-            };
-            Thread thread = new Thread(myLogic);
-            thread.start();
-            threads.add(thread);
-        }
-
-        for (Thread thread : threads) {
-            thread.join(); // зависаем, ждём когда поток объект которого лежит в thread завершится
-        }
-
-        long endTs = System.currentTimeMillis(); // end time
-
-        System.out.println("Time: " + (endTs - startTs) + "ms");
-    }
-
-    public static String generateText(String letters, int length) {
-        Random random = new Random();
-        StringBuilder text = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            text.append(letters.charAt(random.nextInt(letters.length())));
-        }
-        return text.toString();
+            }
+        );
     }
 }
